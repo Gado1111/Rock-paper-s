@@ -2,6 +2,15 @@ import random
 import tkinter as tk
 from tkinter import messagebox
 
+# If running in a headless environment (e.g., server), use pyvirtualdisplay to simulate a display
+try:
+    from pyvirtualdisplay import Display
+    # Start a virtual display
+    display = Display(visible=0, size=(800, 600))
+    display.start()
+except ImportError:
+    display = None  # If pyvirtualdisplay is not available, continue without it
+
 # Game logic functions
 def get_computer_choice():
     options = ['rock', 'paper', 'scissors']
@@ -139,3 +148,7 @@ exit_button.pack(pady=10)
 
 # Run the application
 root.mainloop()
+
+# Stop the virtual display if it was used
+if display:
+    display.stop()
