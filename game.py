@@ -79,61 +79,83 @@ def enable_choice_buttons():
     paper_button.config(state="normal")
     scissors_button.config(state="normal")
 
-# Main window setup
-root = tk.Tk()
-root.title("Rock, Paper, Scissors Game")
+# Check if running in headless mode and bind to a port
+def start_headless_server():
+    from flask import Flask, jsonify
 
-game_mode = "computer"  # Default mode
-player2_choice = tk.StringVar()
+    app = Flask(__name__)
 
-mode_frame = tk.Frame(root)
-mode_frame.pack(pady=10)
+    @app.route("/")
+    def status():
+        return jsonify({"status": "Running in headless mode"})
 
-tk.Label(mode_frame, text="Choose Game Mode", font=("Arial", 14)).pack()
-tk.Button(mode_frame, text="Play vs Computer", font=("Arial", 12), width=15, command=lambda: select_mode("computer")).pack(pady=5)
-tk.Button(mode_frame, text="Play Multiplayer", font=("Arial", 12), width=15, command=lambda: select_mode("multiplayer")).pack(pady=5)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
 
-main_frame = tk.Frame(root)
+# Main application
+if __name__ == "__main__":
+    try:
+        import os
 
-name_frame = tk.Frame(main_frame)
-name_frame.pack(pady=10)
+        # If in a headless environment, start Flask server
+        if "RENDER" in os.environ or not os.environ.get("DISPLAY"):
+            start_headless_server()
+        else:
+            # GUI-based application
+            root = tk.Tk()
+            root.title("Rock, Paper, Scissors Game")
 
-tk.Label(name_frame, text="Enter your name:", font=("Arial", 12)).grid(row=0, column=0, padx=5)
-player_name = tk.Entry(name_frame, font=("Arial", 12), width=15)
-player_name.grid(row=0, column=1, padx=5)
+            game_mode = "computer"  # Default mode
+            player2_choice = tk.StringVar()
 
-choice_instructions = tk.Label(main_frame, text="Make your choice:", font=("Arial", 14))
-choice_instructions.pack(pady=5)
+            mode_frame = tk.Frame(root)
+            mode_frame.pack(pady=10)
 
-player_choice_label = tk.Label(main_frame, text="You chose:", font=("Arial", 14))
-player_choice_label.pack(pady=5)
+            tk.Label(mode_frame, text="Choose Game Mode", font=("Arial", 14)).pack()
+            tk.Button(mode_frame, text="Play vs Computer", font=("Arial", 12), width=15, command=lambda: select_mode("computer")).pack(pady=5)
+            tk.Button(mode_frame, text="Play Multiplayer", font=("Arial", 12), width=15, command=lambda: select_mode("multiplayer")).pack(pady=5)
 
-computer_choice_label = tk.Label(main_frame, text="Computer chose:", font=("Arial", 14))
-computer_choice_label.pack(pady=5)
+            main_frame = tk.Frame(root)
 
-result_label = tk.Label(main_frame, text="Result:", font=("Arial", 16, "bold"))
-result_label.pack(pady=10)
+            name_frame = tk.Frame(main_frame)
+            name_frame.pack(pady=10)
 
-button_frame = tk.Frame(main_frame)
-button_frame.pack(pady=10)
+            tk.Label(name_frame, text="Enter your name:", font=("Arial", 12)).grid(row=0, column=0, padx=5)
+            player_name = tk.Entry(name_frame, font=("Arial", 12), width=15)
+            player_name.grid(row=0, column=1, padx=5)
 
-rock_button = tk.Button(button_frame, text="Rock", font=("Arial", 12), width=10, command=lambda: play_game("rock"))
-rock_button.grid(row=0, column=0, padx=5)
+            choice_instructions = tk.Label(main_frame, text="Make your choice:", font=("Arial", 14))
+            choice_instructions.pack(pady=5)
 
-paper_button = tk.Button(button_frame, text="Paper", font=("Arial", 12), width=10, command=lambda: play_game("paper"))
-paper_button.grid(row=0, column=1, padx=5)
+            player_choice_label = tk.Label(main_frame, text="You chose:", font=("Arial", 14))
+            player_choice_label.pack(pady=5)
 
-scissors_button = tk.Button(button_frame, text="Scissors", font=("Arial", 12), width=10, command=lambda: play_game("scissors"))
-scissors_button.grid(row=0, column=2, padx=5)
+            computer_choice_label = tk.Label(main_frame, text="Computer chose:", font=("Arial", 14))
+            computer_choice_label.pack(pady=5)
 
-replay_button = tk.Button(main_frame, text="Replay", font=("Arial", 12), command=replay_game)
-replay_button.pack(pady=10)
+            result_label = tk.Label(main_frame, text="Result:", font=("Arial", 16, "bold"))
+            result_label.pack(pady=10)
 
-exit_button = tk.Button(main_frame, text="Exit", font=("Arial", 12), command=root.quit)
-exit_button.pack(pady=10)
+            button_frame = tk.Frame(main_frame)
+            button_frame.pack(pady=10)
 
-root.mainloop()
+            rock_button = tk.Button(button_frame, text="Rock", font=("Arial", 12), width=10, command=lambda: play_game("rock"))
+            rock_button.grid(row=0, column=0, padx=5)
 
-# Stop virtual display if used
-if display:
-    display.stop()
+            paper_button = tk.Button(button_frame, text="Paper", font=("Arial", 12), width=10, command=lambda: play_game("paper"))
+            paper_button.grid(row=0, column=1, padx=5)
+
+            scissors_button = tk.Button(button_frame, text="Scissors", font=("Arial", 12), width=10, command=lambda: play_game("scissors"))
+            scissors_button.grid(row=0, column=2, padx=5)
+
+            replay_button = tk.Button(main_frame, text="Replay", font=("Arial", 12), command=replay_game)
+            replay_button.pack(pady=10)
+
+            exit_button = tk.Button(main_frame, text="Exit", font=("Arial", 12), command=root.quit)
+            exit_button.pack(pady=10)
+
+            root.mainloop()
+
+    finally:
+        if display:
+            display.stop()
