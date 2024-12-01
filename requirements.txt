@@ -2,4 +2,4 @@
 # Your other dependencies
 flask               # Or any other framework/library you're using
 gunicorn            # Gunicorn for running the app in production
-
+pyvirtualdisplay    # To support virtual displays for GUI apps in headless environments.
